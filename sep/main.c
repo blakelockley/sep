@@ -7,12 +7,12 @@
 int main(int argc, char **argv) {
 
     //allocate space for one int and store 7 in that location
-    ALLOC(1); //%0
+    ALLOC(4); //%0
     MUTATE_L(7, 0);
 
     //allocate space for one int and store 3 in that location
-    ALLOC(1); //%1
-    MUTATE_L(3, 1);
+    GEP(0, 3); //%1
+    MUTATE_L(2, 1);
 
     //look up the two previous values, add them and store in the second location
     LOOKUP(0); //%2

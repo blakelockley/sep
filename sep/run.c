@@ -99,6 +99,7 @@ void exec_alloc(alloc_inst_t *inst) {
         (*dptr)->prev = last;
         last = *dptr;
         dptr = &(*dptr)->next;
+        _heap[address + i - PSEUDO_OFFSET] = 0;
     }
 
     add_reg(address);
@@ -139,6 +140,10 @@ void exec_add(add_inst_t *inst) {
     add_reg(regs[inst->reg_1] + regs[inst->reg_2]);
 }
 
+void exec_gep(gep_inst_t *inst) {
+    add_reg(regs[inst->reg_addr] + inst->offset);
+}
+
 void run(void) {
     static node_t **node = &nodes;
 
@@ -172,6 +177,10 @@ void run(void) {
 
         case INST_ADD:
             exec_add((add_inst_t *) (*node)->inst);
+            break;
+
+        case INST_GEP:
+            exec_gep((gep_inst_t *) (*node)->inst);
             break;
 
         default:

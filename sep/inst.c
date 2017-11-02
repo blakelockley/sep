@@ -62,6 +62,11 @@ void print_node(node_t *node) {
             printf("%%%d\n", ((add_inst_t*) node->inst)->reg_2);
             break;
 
+        case INST_GEP:
+            printf("GEP %%%d ", ((gep_inst_t*) node->inst)->reg_addr);
+            printf("$%d\n", ((gep_inst_t*) node->inst)->offset);
+            break;
+
         default:
             printf("ERROR: unkown node name\n");
             exit(1);
@@ -119,6 +124,14 @@ add_inst_t *new_add(int reg_1, int reg_2) {
     result->name = INST_ADD;
     result->reg_1 = reg_1;
     result->reg_2 = reg_2;
+    return result;
+}
+
+gep_inst_t *new_gep(int reg_addr, int offset) {
+    gep_inst_t *result = (gep_inst_t *) malloc(sizeof(gep_inst_t));
+    result->name = INST_GEP;
+    result->reg_addr = reg_addr;
+    result->offset = offset;
     return result;
 }
 

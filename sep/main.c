@@ -23,9 +23,12 @@ int main(int argc, char **argv) {
     //deallocate (only) the first memory location
     FREE(0);
 
+    init();
     run();
     print_insts();
     print_regs();
     print_heap();
+
     delete_insts();
+    //TODO: delete memory
 }

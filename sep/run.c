@@ -4,24 +4,33 @@
 #include "run.h"
 #include "inst.h"
 
+//a pseudo offset is provided
+#define PSEUDO_OFFSET 0x40c0
+
 #pragma mark - heap
 
 typedef struct heap_node {
     int address;
-    int value;
     struct heap_node *prev;
     struct heap_node *next;
 } heap_node_t;
+
+int *_heap;
+int _heap_capacity;
 
 heap_node_t *heap = NULL;
 
 heap_node_t *new_heap_node(int address) {
     heap_node_t *node = malloc(sizeof(heap_node_t));
     node->address = address;
-    node->value = 0;
     node->prev = NULL;
     node->next = NULL;
     return node;
+}
+
+void init_heap(int inital_capacity) {
+    _heap_capacity = inital_capacity;
+    _heap = malloc(sizeof(int) * inital_capacity);
 }
 
 void print_heap(void) {
@@ -29,7 +38,7 @@ void print_heap(void) {
 
     printf("== HEAP ==\n");
     while (node != NULL) {
-        printf("0x%x: %d\n", node->address, node->value);
+        printf("0x%x: 0x%x\n", node->address, _heap[node->address - PSEUDO_OFFSET]);
         node = node->next;
     }
 }
@@ -60,10 +69,15 @@ void print_regs(void) {
     if (regs == NULL)
         return;
     for (int i = 0; i < reg_size; i++)
-        printf("%%%d: %d\n", i, regs[i]);
+        printf("%%%d: 0x%x\n", i, regs[i]);
 }
 
 #pragma mark - exec
+
+void init(void) {
+    init_regs(10);
+    init_heap(32);
+}
 
 void exec_alloc(alloc_inst_t *inst) {
     if (inst->size <= 0)
@@ -76,7 +90,7 @@ void exec_alloc(alloc_inst_t *inst) {
         dptr = &(*dptr)->next;
     }
 
-    int address = 0;
+    int address = PSEUDO_OFFSET;
     if (last != NULL)
         address = last->address + 1;
 
@@ -90,35 +104,10 @@ void exec_alloc(alloc_inst_t *inst) {
     add_reg(address);
 }
 
-void exec_mutate(mutate_inst_t *inst) {
-    heap_node_t *node = heap;
-
-    while (node != NULL) {
-        if (node->address == regs[inst->regr]) {
-            node->value = regs[inst->regl];
-            break;
-        }
-        node = node->next;
-    }
-}
-
-void exec_mutate_l(mutate_l_inst_t *inst) {
-    heap_node_t *node = heap;
-
-    while (node != NULL) {
-        if (node->address == regs[inst->regr]) {
-            node->value = inst->val;
-            break;
-        }
-        node = node->next;
-    }
-}
-
 void exec_free(free_inst_t *inst) {
     heap_node_t *node = heap;
-
     while (node != NULL) {
-        if (node->address == regs[inst->reg]) {
+        if (node->address == regs[inst->reg_addr]) {
             if (node == heap)
                 heap = node->next;
             else
@@ -130,24 +119,24 @@ void exec_free(free_inst_t *inst) {
     }
 }
 
-void exec_lookup(lookup_inst_t *inst) {
-    heap_node_t *node = heap;
+void exec_mutate(mutate_inst_t *inst) {
+    _heap[regs[inst->reg_addr] - PSEUDO_OFFSET] = regs[inst->reg_val];
+}
 
-    while (node != NULL) {
-        if (node->address == regs[inst->reg]) {
-            add_reg(node->value);
-            break;
-        }
-        node = node->next;
-    }
+void exec_mutate_l(mutate_l_inst_t *inst) {
+    _heap[regs[inst->reg_addr] - PSEUDO_OFFSET] = inst->val;
+}
+
+void exec_lookup(lookup_inst_t *inst) {
+    add_reg(_heap[regs[inst->reg_addr] - PSEUDO_OFFSET]);
 }
 
 void exec_literal(literal_inst_t *inst) {
-    add_reg(inst->value);
+    add_reg(inst->val);
 }
 
 void exec_add(add_inst_t *inst) {
-    add_reg(regs[inst->lhs] + regs[inst->rhs]);
+    add_reg(regs[inst->reg_1] + regs[inst->reg_2]);
 }
 
 void run(void) {
@@ -155,10 +144,7 @@ void run(void) {
 
     if (*node == NULL)
         return;
-
-    if (regs == NULL)
-        init_regs(10);
-
+    
     switch ((*node)->inst->name) {
         case INST_ALLOC:
             exec_alloc((alloc_inst_t *) (*node)->inst);

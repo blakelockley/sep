@@ -63,10 +63,10 @@
 		EF4A16271FAB37550021661E /* sep */ = {
 			isa = PBXGroup;
 			children = (
-				EF4A16321FAB38EA0021661E /* inst.c */,
 				EF4A162F1FAB38EA0021661E /* inst.h */,
-				EF4A16301FAB38EA0021661E /* run.c */,
+				EF4A16321FAB38EA0021661E /* inst.c */,
 				EF4A16311FAB38EA0021661E /* run.h */,
+				EF4A16301FAB38EA0021661E /* run.c */,
 				EF4A16281FAB37550021661E /* main.c */,
 			);
 			path = sep;

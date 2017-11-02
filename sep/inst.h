@@ -5,13 +5,13 @@
 #ifndef INST_H
 #define INST_H
 
-#define ALLOC(n) ( add_node(new_alloc(n)) )
-#define FREE(reg) ( add_node(new_free(reg)) )
-#define LOOKUP(reg) ( add_node(new_lookup(reg)) )
-#define MUTATE(regl, regr) ( add_node(new_mutate(regl, regr)) )
-#define MUTATE_L(val,regr) ( add_node(new_mutate_l(val, regr)) )
-#define LITERAL(value) ( add_node(new_literal(value)) )
-#define ADD(lhs, rhs) ( add_node(new_add(lhs, rhs)) )
+#define ALLOC(size) ( add_node(new_alloc(size)) )
+#define FREE(reg_addr) ( add_node(new_free(reg_addr)) )
+#define LOOKUP(reg_addr) ( add_node(new_lookup(reg_addr)) )
+#define MUTATE(reg_val, reg_addr) ( add_node(new_mutate(reg_val, reg_addr)) )
+#define MUTATE_L(val, reg_addr) ( add_node(new_mutate_l(val, reg_addr)) )
+#define LITERAL(val) ( add_node(new_literal(val)) )
+#define ADD(reg_1, reg_2) ( add_node(new_add(reg_1, reg_2)) )
 
 typedef enum {
     INST_ALLOC, INST_FREE, INST_MUTATE, INST_MUTATE_L, INST_LOOKUP, INST_LITERAL, INST_ADD
@@ -34,35 +34,35 @@ typedef struct {
 
 typedef struct {
     inst_name_t name;
-    int reg; //reg containing address of space to free on heap
+    int reg_addr; //reg containing address of space to free on heap
 } free_inst_t;
 
 typedef struct {
     inst_name_t name;
-    int regl; //reg containing value to store
-    int regr; //reg containing address to store value
+    int reg_val; //reg containing value to store
+    int reg_addr; //reg containing address to store value
 } mutate_inst_t;
 
 typedef struct {
     inst_name_t name;
     int val; //value to store
-    int regr; //reg containing address to store value
+    int reg_addr; //reg containing address to store value
 } mutate_l_inst_t;
 
 typedef struct {
     inst_name_t name;
-    int reg; //reg containing address of space to load from heap
+    int reg_addr; //reg containing address of space to load from heap
 } lookup_inst_t;
 
 typedef struct {
     inst_name_t name;
-    int value; //reg containing address of space to load from heap
+    int val; //reg containing address of space to load from heap
 } literal_inst_t;
 
 typedef struct {
     inst_name_t name;
-    int lhs; //reg containing address of lhs
-    int rhs; //reg containing address of rhs
+    int reg_1; //reg containing address of lhs
+    int reg_2; //reg containing address of rhs
 } add_inst_t;
 
 extern node_t *nodes;
@@ -72,12 +72,12 @@ void print_insts(void);
 void delete_insts(void);
 
 alloc_inst_t *new_alloc(int size);
-free_inst_t *new_free(int reg);
-mutate_inst_t *new_mutate(int lval, int rval);
-mutate_l_inst_t *new_mutate_l(int val, int rval);
-lookup_inst_t *new_lookup(int reg);
-literal_inst_t *new_literal(int value);
-add_inst_t *new_add(int lhs, int rhs);
+free_inst_t *new_free(int reg_addr);
+mutate_inst_t *new_mutate(int reg_val, int reg_addr);
+mutate_l_inst_t *new_mutate_l(int val, int reg_addr);
+lookup_inst_t *new_lookup(int reg_addr);
+literal_inst_t *new_literal(int val);
+add_inst_t *new_add(int reg_1, int reg_2);
 
 #endif /* INST_H */
 

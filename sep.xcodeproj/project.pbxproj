@@ -8,6 +8,8 @@
 
 /* Begin PBXBuildFile section */
 		EF4A16291FAB37550021661E /* main.c in Sources */ = {isa = PBXBuildFile; fileRef = EF4A16281FAB37550021661E /* main.c */; };
+		EF4A16331FAB38EA0021661E /* run.c in Sources */ = {isa = PBXBuildFile; fileRef = EF4A16301FAB38EA0021661E /* run.c */; };
+		EF4A16341FAB38EA0021661E /* inst.c in Sources */ = {isa = PBXBuildFile; fileRef = EF4A16321FAB38EA0021661E /* inst.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -25,6 +27,10 @@
 /* Begin PBXFileReference section */
 		EF4A16251FAB37550021661E /* sep */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = sep; sourceTree = BUILT_PRODUCTS_DIR; };
 		EF4A16281FAB37550021661E /* main.c */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.c; path = main.c; sourceTree = "<group>"; };
+		EF4A162F1FAB38EA0021661E /* inst.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = inst.h; sourceTree = "<group>"; };
+		EF4A16301FAB38EA0021661E /* run.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = run.c; sourceTree = "<group>"; };
+		EF4A16311FAB38EA0021661E /* run.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = run.h; sourceTree = "<group>"; };
+		EF4A16321FAB38EA0021661E /* inst.c */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.c; path = inst.c; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -57,6 +63,10 @@
 		EF4A16271FAB37550021661E /* sep */ = {
 			isa = PBXGroup;
 			children = (
+				EF4A16321FAB38EA0021661E /* inst.c */,
+				EF4A162F1FAB38EA0021661E /* inst.h */,
+				EF4A16301FAB38EA0021661E /* run.c */,
+				EF4A16311FAB38EA0021661E /* run.h */,
 				EF4A16281FAB37550021661E /* main.c */,
 			);
 			path = sep;
@@ -120,6 +130,8 @@
 			buildActionMask = 2147483647;
 			files = (
 				EF4A16291FAB37550021661E /* main.c in Sources */,
+				EF4A16341FAB38EA0021661E /* inst.c in Sources */,
+				EF4A16331FAB38EA0021661E /* run.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

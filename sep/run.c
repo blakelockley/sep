@@ -1,36 +1,38 @@
 //Blake Lockley
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <time.h>
 #include "run.h"
 #include "inst.h"
 
-//a pseudo offset is provided
-#define PSEUDO_OFFSET 0x40c0
+//a pseudo offset makes addresses some what more recgonisable
+#define PSEUDO_OFFSET 0x1000
 
 #pragma mark - heap
 
 typedef struct heap_node {
     int address;
+    int value;
     struct heap_node *prev;
     struct heap_node *next;
 } heap_node_t;
-
-int *_heap;
-int _heap_capacity;
 
 heap_node_t *heap = NULL;
 
 heap_node_t *new_heap_node(int address) {
     heap_node_t *node = malloc(sizeof(heap_node_t));
+    node->value = 0;
     node->address = address;
     node->prev = NULL;
     node->next = NULL;
     return node;
 }
 
-void init_heap(int inital_capacity) {
-    _heap_capacity = inital_capacity;
-    _heap = malloc(sizeof(int) * inital_capacity);
+void delete_heap_node(heap_node_t *node) {
+    if (node == NULL)
+        return;
+    delete_heap_node(node->next);
 }
 
 void print_heap(void) {
@@ -38,7 +40,7 @@ void print_heap(void) {
 
     printf("== HEAP ==\n");
     while (node != NULL) {
-        printf("0x%x: 0x%x\n", node->address, _heap[node->address - PSEUDO_OFFSET]);
+        printf("0x%x: 0x%x\n", node->address, node->value);
         node = node->next;
     }
 }
@@ -76,7 +78,7 @@ void print_regs(void) {
 
 void init(void) {
     init_regs(10);
-    init_heap(32);
+    srand((unsigned)time(NULL));
 }
 
 void exec_alloc(alloc_inst_t *inst) {
@@ -90,16 +92,18 @@ void exec_alloc(alloc_inst_t *inst) {
         dptr = &(*dptr)->next;
     }
 
-    int address = PSEUDO_OFFSET;
+    int address;
     if (last != NULL)
-        address = last->address + 1;
+        address = last->address;
+    else
+        address = PSEUDO_OFFSET;
+    address += (rand() % 0x40);
 
     for (int i = 0; i < inst->size; i++) {
         *dptr = new_heap_node(address + i);
         (*dptr)->prev = last;
         last = *dptr;
         dptr = &(*dptr)->next;
-        _heap[address + i - PSEUDO_OFFSET] = 0;
     }
 
     add_reg(address);
@@ -121,15 +125,36 @@ void exec_free(free_inst_t *inst) {
 }
 
 void exec_mutate(mutate_inst_t *inst) {
-    _heap[regs[inst->reg_addr] - PSEUDO_OFFSET] = regs[inst->reg_val];
+    heap_node_t *node = heap;
+    while (node != NULL) {
+        if (node->address == regs[inst->reg_addr]) {
+            node->value = regs[inst->reg_val];
+            break;
+        }
+        node = node->next;
+    }
 }
 
 void exec_mutate_l(mutate_l_inst_t *inst) {
-    _heap[regs[inst->reg_addr] - PSEUDO_OFFSET] = inst->val;
+    heap_node_t *node = heap;
+    while (node != NULL) {
+        if (node->address == regs[inst->reg_addr]) {
+            node->value = inst->val;
+            break;
+        }
+        node = node->next;
+    }
 }
 
 void exec_lookup(lookup_inst_t *inst) {
-    add_reg(_heap[regs[inst->reg_addr] - PSEUDO_OFFSET]);
+    heap_node_t *node = heap;
+    while (node != NULL) {
+        if (node->address == regs[inst->reg_addr]) {
+            add_reg(node->value);
+            break;
+        }
+        node = node->next;
+    }
 }
 
 void exec_literal(literal_inst_t *inst) {
@@ -190,4 +215,9 @@ void run(void) {
 
     node = &(*node)->next;
     run();
+}
+
+void delete_memory(void) {
+    free(regs);
+    delete_heap_node(heap);
 }
